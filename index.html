@@ -82,7 +82,7 @@
 <body>
   <header>
     <h1 class="title">Simple Task Helper</h1>
-    <p class="subtitle">A tiny, single-file website with three everyday tools. Copy → paste → deploy anywhere.</p>
+    <p class="subtitle">A tiny, single-file website with four everyday tools. Copy → paste → deploy anywhere.</p>
   </header>
 
   <div class="container">
@@ -90,6 +90,7 @@
       <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tip" id="tab-tip">Tip Calculator</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="convert" id="tab-convert">Unit Converter</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="text" id="tab-text">Text Counter</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="date" id="tab-date">Date Difference</button>
     </nav>
 
     <!-- Tip Calculator -->
@@ -178,6 +179,29 @@
         </div>
       </div>
     </section>
+
+    <!-- Date Difference Calculator -->
+    <section id="date" role="tabpanel" class="hidden" aria-labelledby="tab-date">
+      <div class="grid">
+        <div class="card">
+          <h2>Date Difference</h2>
+          <p class="desc">Find the number of days between two dates.</p>
+
+          <label for="startDate">Start Date</label>
+          <input type="date" id="startDate">
+
+          <label for="endDate">End Date</label>
+          <input type="date" id="endDate">
+
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn" id="calcDate">Calculate</button>
+            <button class="btn secondary" id="resetDate">Reset</button>
+          </div>
+
+          <div class="out" id="dateOut" aria-live="polite">Choose two dates and click Calculate.</div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <footer>
@@ -190,6 +214,7 @@
       {btn: document.getElementById('tab-tip'), panel: document.getElementById('tip')},
       {btn: document.getElementById('tab-convert'), panel: document.getElementById('convert')},
       {btn: document.getElementById('tab-text'), panel: document.getElementById('text')},
+      {btn: document.getElementById('tab-date'), panel: document.getElementById('date')},
     ];
     tabs.forEach(({btn, panel}) => {
       btn.addEventListener('click', () => {
@@ -198,8 +223,9 @@
       });
     });
 
-    // --- Tip Calculator ---
     const $ = id => document.getElementById(id);
+
+    // --- Tip Calculator ---
     $('calcTip').addEventListener('click', () => {
       const bill = parseFloat($('bill').value || '0');
       const tipPct = parseFloat($('tipPercent').value || '0');
@@ -242,6 +268,31 @@
     $('analyze').addEventListener('click', analyzeText);
     $('clearText').addEventListener('click', () => { $('textbox').value = ''; $('textOut').textContent = 'Nothing analyzed yet.'; });
 
+    // --- Date Difference Calculator ---
+    $('calcDate').addEventListener('click', () => {
+      const start = new Date($('startDate').value);
+      const end = new Date($('endDate').value);
+
+      if (!start || !end || isNaN(start) || isNaN(end)) {
+        return $('dateOut').textContent = 'Please select valid dates.';
+      }
+
+      const diffMs = end - start;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) {
+        $('dateOut').textContent = 'End date must be after start date.';
+      } else {
+        $('dateOut').innerHTML = `Difference: <strong>${diffDays} day(s)</strong>`;
+      }
+    });
+
+    $('resetDate').addEventListener('click', () => {
+      $('startDate').value = '';
+      $('endDate').value = '';
+      $('dateOut').textContent = 'Choose two dates and click Calculate.';
+    });
+
     // Accessibility: Enter key triggers primary action if focused on inputs.
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -249,6 +300,7 @@
         if (['bill','tipPercent','people'].includes(active)) $('calcTip').click();
         if (['cm','inch'].includes(active)) $('toInch').click();
         if (['textbox'].includes(active)) $('analyze').click();
+        if (['startDate','endDate'].includes(active)) $('calcDate').click();
       }
     });
   </script>
