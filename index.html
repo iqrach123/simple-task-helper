@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple Task Helper</title>
+  <style>
+    :root {
+      --bg: #0f172a;          /* slate-900 */
+      --panel: #111827;       /* gray-900 */
+      --muted: #94a3b8;       /* slate-400 */
+      --text: #e5e7eb;        /* gray-200 */
+      --accent: #22c55e;      /* green-500 */
+      --accent-2: #60a5fa;    /* blue-400 */
+      --card: #0b1220;        /* custom dark */
+      --ring: rgba(96,165,250,.35);
+      --shadow: rgba(0,0,0,.4);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 20% -10%, #1e293b55, transparent),
+                  radial-gradient(1000px 500px at 120% 10%, #0ea5e955, transparent),
+                  var(--bg);
+      color: var(--text);
+    }
+    header {
+      max-width: 980px; margin: 32px auto 10px; padding: 0 16px;
+    }
+    .title { font-size: clamp(24px, 4vw, 40px); margin: 0 0 6px; letter-spacing: .3px; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 15px; }
+
+    .container { max-width: 980px; margin: 20px auto 60px; padding: 0 16px; }
+
+    .tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .tab-btn {
+      border: 1px solid #334155; color: var(--text); background: #0b1220; padding: 10px 14px;
+      border-radius: 999px; cursor: pointer; transition: transform .05s ease, box-shadow .2s, background .2s;
+    }
+    .tab-btn[aria-selected="true"] { background: #0e1a32; border-color: #3b82f6; box-shadow: 0 0 0 3px var(--ring) inset; }
+    .tab-btn:active { transform: translateY(1px); }
+
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .card { grid-column: span 12; background: linear-gradient(180deg, #0b1220, #0a1020);
+            border: 1px solid #1f2937; border-radius: 18px; padding: 18px; box-shadow: 0 10px 30px var(--shadow);
+    }
+    @media (min-width: 720px) {
+      .card.half { grid-column: span 6; }
+    }
+    .card h2 { margin: 0 0 10px; font-size: 18px; font-weight: 700; letter-spacing: .2px; }
+    .desc { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+
+    label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 6px; }
+    input, select, textarea {
+      width: 100%; padding: 12px 12px; border-radius: 12px; border: 1px solid #334155; background: #0a1222; color: var(--text);
+      outline: none; transition: box-shadow .2s, border-color .2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 4px var(--ring); }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; border: 1px solid #2f4b3a; background: #0d1b14; color: #d1fae5;
+      padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; letter-spacing: .3px;
+    }
+    .btn.secondary { border-color: #2b3f66; background: #0c1630; color: #dbeafe; }
+    .btn:active { transform: translateY(1px); }
+
+    .out {
+      margin-top: 12px; padding: 12px; border-radius: 12px; background: #0a1020; border: 1px solid #1f2937; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .small { font-size: 13px; }
+    footer { max-width: 980px; margin: 30px auto 60px; padding: 0 16px; color: var(--muted); font-size: 13px; }
+    a { color: var(--accent-2); text-decoration: none; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="title">Simple Task Helper</h1>
+    <p class="subtitle">A tiny, single-file website with three everyday tools. Copy → paste → deploy anywhere.</p>
+  </header>
+
+  <div class="container">
+    <nav class="tabs" role="tablist" aria-label="Tools">
+      <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tip" id="tab-tip">Tip Calculator</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="convert" id="tab-convert">Unit Converter</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="text" id="tab-text">Text Counter</button>
+    </nav>
+
+    <!-- Tip Calculator -->
+    <section id="tip" role="tabpanel" aria-labelledby="tab-tip">
+      <div class="grid">
+        <div class="card half">
+          <h2>Tip Calculator</h2>
+          <p class="desc">Quickly split a bill with tip and round the totals neatly.</p>
+          <label for="bill">Bill amount</label>
+          <input id="bill" type="number" min="0" step="0.01" placeholder="e.g., 2350.00" />
+
+          <div class="row">
+            <div>
+              <label for="tipPercent">Tip %</label>
+              <select id="tipPercent">
+                <option value="5">5%</option>
+                <option value="8">8%</option>
+                <option value="10" selected>10%</option>
+                <option value="12">12%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+              </select>
+            </div>
+            <div>
+              <label for="people">People</label>
+              <input id="people" type="number" min="1" step="1" value="1" />
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn" id="calcTip">Calculate</button>
+            <button class="btn secondary" id="resetTip">Reset</button>
+          </div>
+          <div class="out" id="tipOut" aria-live="polite">Enter values and click Calculate.</div>
+        </div>
+
+        <div class="card half">
+          <h2>How it works</h2>
+          <p class="small">We compute: <code>tip = bill × (tip% / 100)</code>. Then:
+            <code>total = bill + tip</code>. Per-person: <code>total / people</code>. Values are rounded to 2 decimals.</p>
+          <p class="muted">Pro tip: change the default percentages in the HTML if your region uses different norms.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Unit Converter -->
+    <section id="convert" role="tabpanel" class="hidden" aria-labelledby="tab-convert">
+      <div class="grid">
+        <div class="card half">
+          <h2>Unit Converter</h2>
+          <p class="desc">Centimeters ⇄ Inches (handy for quick size checks).</p>
+          <label for="cm">Centimeters</label>
+          <input id="cm" type="number" step="0.01" placeholder="e.g., 10" />
+
+          <label for="inch">Inches</label>
+          <input id="inch" type="number" step="0.001" placeholder="e.g., 3.937" />
+
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn" id="toInch">CM ➜ IN</button>
+            <button class="btn secondary" id="toCm">IN ➜ CM</button>
+          </div>
+          <div class="out" id="convOut" aria-live="polite">Enter a value and convert either way.</div>
+        </div>
+
+        <div class="card half">
+          <h2>Conversions used</h2>
+          <p class="small"><code>1 inch = 2.54 cm</code>. We round to 3 decimals for inches and 2 decimals for centimeters.</p>
+          <p class="muted">Extend by duplicating this card and changing formulas (e.g., kg ⇄ lb, °C ⇄ °F).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Text Counter -->
+    <section id="text" role="tabpanel" class="hidden" aria-labelledby="tab-text">
+      <div class="grid">
+        <div class="card">
+          <h2>Text Counter</h2>
+          <p class="desc">Count characters and words for captions, SMS, or tweets.</p>
+          <label for="textbox">Your text</label>
+          <textarea id="textbox" rows="6" placeholder="Type or paste here..."></textarea>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn" id="analyze">Analyze</button>
+            <button class="btn secondary" id="clearText">Clear</button>
+          </div>
+          <div class="out" id="textOut" aria-live="polite">Nothing analyzed yet.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Built as a lightweight starter you can customize. It’s just one file: HTML + CSS + a sprinkle of JS.
+  </footer>
+
+  <script>
+    // --- Tabs ---
+    const tabs = [
+      {btn: document.getElementById('tab-tip'), panel: document.getElementById('tip')},
+      {btn: document.getElementById('tab-convert'), panel: document.getElementById('convert')},
+      {btn: document.getElementById('tab-text'), panel: document.getElementById('text')},
+    ];
+    tabs.forEach(({btn, panel}) => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(t => { t.btn.setAttribute('aria-selected','false'); t.panel.classList.add('hidden'); });
+        btn.setAttribute('aria-selected','true'); panel.classList.remove('hidden'); panel.querySelector('input, textarea')?.focus();
+      });
+    });
+
+    // --- Tip Calculator ---
+    const $ = id => document.getElementById(id);
+    $('calcTip').addEventListener('click', () => {
+      const bill = parseFloat($('bill').value || '0');
+      const tipPct = parseFloat($('tipPercent').value || '0');
+      const people = Math.max(1, parseInt($('people').value || '1', 10));
+      if (bill <= 0) return $('tipOut').textContent = 'Please enter a valid bill amount (> 0).';
+      const tip = +(bill * (tipPct/100)).toFixed(2);
+      const total = +(bill + tip).toFixed(2);
+      const perPerson = +(total / people).toFixed(2);
+      $('tipOut').innerHTML = `Tip: <strong>Rs ${tip.toLocaleString()}</strong><br>Total: <strong>Rs ${total.toLocaleString()}</strong><br>Per person (${people}): <strong>Rs ${perPerson.toLocaleString()}</strong>`;
+    });
+    $('resetTip').addEventListener('click', () => {
+      $('bill').value = '';
+      $('tipPercent').value = '10';
+      $('people').value = '1';
+      $('tipOut').textContent = 'Enter values and click Calculate.';
+    });
+
+    // --- Converter ---
+    const CM_PER_INCH = 2.54;
+    $('toInch').addEventListener('click', () => {
+      const cm = parseFloat($('cm').value || '0');
+      if (cm === 0) return $('convOut').textContent = 'Enter centimeters to convert to inches.';
+      const inch = cm / CM_PER_INCH; $('inch').value = inch.toFixed(3);
+      $('convOut').textContent = `${cm} cm = ${inch.toFixed(3)} in`;
+    });
+    $('toCm').addEventListener('click', () => {
+      const inch = parseFloat($('inch').value || '0');
+      if (inch === 0) return $('convOut').textContent = 'Enter inches to convert to centimeters.';
+      const cm = inch * CM_PER_INCH; $('cm').value = cm.toFixed(2);
+      $('convOut').textContent = `${inch} in = ${cm.toFixed(2)} cm`;
+    });
+
+    // --- Text Counter ---
+    function analyzeText() {
+      const t = $('textbox').value.trim();
+      const chars = t.length;
+      const words = t ? t.split(/\s+/).length : 0;
+      $('textOut').innerHTML = `Characters: <strong>${chars}</strong><br>Words: <strong>${words}</strong>`;
+    }
+    $('analyze').addEventListener('click', analyzeText);
+    $('clearText').addEventListener('click', () => { $('textbox').value = ''; $('textOut').textContent = 'Nothing analyzed yet.'; });
+
+    // Accessibility: Enter key triggers primary action if focused on inputs.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const active = document.activeElement?.id;
+        if (['bill','tipPercent','people'].includes(active)) $('calcTip').click();
+        if (['cm','inch'].includes(active)) $('toInch').click();
+        if (['textbox'].includes(active)) $('analyze').click();
+      }
+    });
+  </script>
+</body>
+</html>
