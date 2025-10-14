@@ -34,3 +34,6 @@ jobs:
           push: true
           tags: iqrach123/simple-task-helper:latest
 
+      # Step 5: Logout from Docker Hub
+      - name: Logout from Docker Hub
+        run: docker logout
