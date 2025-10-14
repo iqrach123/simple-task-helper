@@ -13,3 +13,6 @@ Whenever code is pushed to the `main` branch, the CI/CD pipeline runs automatica
 ```bash
 docker build -t simple-task-helper .
 docker run -d -p 80:80 simple-task-helper
+
+## Update Log
+- Triggering CI/CD pipeline test (14 Oct 2025)
