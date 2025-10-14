@@ -1,6 +1,6 @@
-# Simple Task Helper 🧠
+# Simple Task Helper 
 
-## 📘 Description
+## Description
 This project automates the build and deployment process using **GitHub Actions** and **Docker Hub**.  
 Whenever code is pushed to the `main` branch, the CI/CD pipeline runs automatically:
 1. Builds a Docker image for the app  
@@ -9,7 +9,7 @@ Whenever code is pushed to the `main` branch, the CI/CD pipeline runs automatica
 
 ---
 
-## ⚙️ How to Run the App Locally
+##  How to Run the App Locally
 ```bash
 docker build -t simple-task-helper .
 docker run -d -p 80:80 simple-task-helper
